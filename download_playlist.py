@@ -24,15 +24,20 @@ def clean_track_name(raw_name: str) -> str:
     """
     Cleans an input track line by:
     1. Ignoring comments and whitespace.
-    2. Stripping leading track numbers (e.g. '1. ', '01 - ', '1) ').
-    3. Normalizing em-dash (—) and en-dash (–) to standard hyphen (-).
-    4. Trimming extraneous spaces.
+    2. Preserving direct URLs and ytsearch queries.
+    3. Stripping leading track numbers (e.g. '1. ', '01 - ', '1) ').
+    4. Normalizing em-dash (—) and en-dash (–) to standard hyphen (-).
+    5. Trimming extraneous spaces.
     """
     if not raw_name:
         return ""
     line = raw_name.strip()
     if not line or line.startswith("#"):
         return ""
+
+    # Preserve URLs and already-formatted ytsearch queries
+    if line.startswith(("http://", "https://", "ytsearch")):
+        return line
 
     # Strip leading track numbers: e.g. "1. ", "01 - ", "1) ", "10: ", "05 "
     line = re.sub(r"^\s*\d+\s*([\.\)\-:]\s*|\s+)", "", line)
@@ -49,10 +54,12 @@ def clean_track_name(raw_name: str) -> str:
 
 def build_search_query(track_name: str, add_audio_suffix: bool = True) -> str:
     """
-    Constructs a ytsearch1 query string.
+    Constructs a ytsearch1 query string or preserves direct URLs/queries.
     Optionally appends 'audio' to bias results toward official audio/lyrics tracks.
     """
     clean_name = track_name.strip()
+    if clean_name.startswith(("http://", "https://", "ytsearch")):
+        return clean_name
     if add_audio_suffix:
         query_text = f"{clean_name} audio"
     else:

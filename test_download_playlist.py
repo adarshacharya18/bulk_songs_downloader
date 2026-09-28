@@ -34,12 +34,22 @@ class TestDownloadPlaylist(unittest.TestCase):
         self.assertEqual(clean_track_name("   "), "")
         self.assertEqual(clean_track_name("# Some comment"), "")
 
+    def test_clean_track_name_urls_and_queries(self):
+        url = "https://www.youtube.com/watch?v=-BzQVu8EuQ4"
+        self.assertEqual(clean_track_name(url), url)
+        query = 'ytsearch1:"Sirra - Guru Randhawa audio"'
+        self.assertEqual(clean_track_name(query), query)
+
     def test_build_search_query(self):
         query = build_search_query("Ilahi - Arijit Singh")
         self.assertEqual(query, 'ytsearch1:"Ilahi - Arijit Singh audio"')
 
         query_no_suffix = build_search_query("Ilahi - Arijit Singh", add_audio_suffix=False)
         self.assertEqual(query_no_suffix, 'ytsearch1:"Ilahi - Arijit Singh"')
+
+        url = "https://www.youtube.com/watch?v=oW9XAbYgGhs"
+        self.assertEqual(build_search_query(url), url)
+        self.assertEqual(build_search_query(url, add_audio_suffix=False), url)
 
     def test_parse_song_list_multiline(self):
         sample = """1. Ilahi — Arijit Singh

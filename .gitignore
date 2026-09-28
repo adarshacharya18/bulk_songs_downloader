@@ -1,0 +1,11 @@
+*.mp3
+*.m4a
+*.webm
+*.part
+*.ytdl
+*.jpg
+*.webp
+__pycache__/
+*.pyc
+.mypy_cache/
+.ruff_cache/

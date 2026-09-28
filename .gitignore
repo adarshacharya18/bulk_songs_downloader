@@ -1,13 +1,35 @@
+# Python cache and environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# Linter and type checker caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Downloaded audio and video media files
 *.mp3
 *.m4a
 *.webm
+*.opus
+*.flac
+*.wav
+*.aac
+*.ogg
 *.part
 *.ytdl
 *.jpg
+*.jpeg
+*.png
 *.webp
-__pycache__/
-*.pyc
-.mypy_cache/
-.ruff_cache/
+
+# Download output directory
+output/
+
+# Runtime and local tracking files
 archive.txt
-output/archive.txt
+queries.txt
+songs.txt

@@ -55,18 +55,21 @@ class TestDownloadPlaylist(unittest.TestCase):
         self.assertEqual(tracks[2], "Safarnama")
 
     def test_parse_real_song_file(self):
-        if os.path.exists("/tmp/GOA_ROAD_TRIP_200_SONGS.txt"):
-            with open("/tmp/GOA_ROAD_TRIP_200_SONGS.txt", "r", encoding="utf-8") as f:
-                content = f.read()
-            tracks = parse_song_list(content)
-            self.assertEqual(len(tracks), 200)
-            self.assertEqual(tracks[0], "Ilahi - Arijit Singh")
-            self.assertEqual(tracks[-1], "Tera Mera Rishta")
+        test_file = (
+            "/tmp/GOA_ROAD_TRIP_200_SONGS.txt"
+            if os.path.exists("/tmp/GOA_ROAD_TRIP_200_SONGS.txt")
+            else os.path.join(os.path.dirname(__file__), "songs.txt.example")
+        )
+        with open(test_file, "r", encoding="utf-8") as f:
+            content = f.read()
+        tracks = parse_song_list(content)
+        self.assertGreater(len(tracks), 0)
+        self.assertEqual(tracks[0], "Ilahi - Arijit Singh")
 
     def test_build_ytdlp_command(self):
         cmd = build_ytdlp_command(
             batch_file="queries.txt",
-            output_dir="/home/adarsh/Music/GOA_TRIP_2026",
+            output_dir="/tmp/music_output",
             archive_file="archive.txt",
             ffmpeg_path="/usr/bin/ffmpeg",
         )
@@ -88,7 +91,7 @@ class TestDownloadPlaylist(unittest.TestCase):
     def test_build_ytdlp_command_custom_sleep(self):
         cmd = build_ytdlp_command(
             batch_file="queries.txt",
-            output_dir="/home/adarsh/Music/GOA_TRIP_2026",
+            output_dir="/tmp/music_output",
             archive_file="archive.txt",
             min_sleep=5,
             max_sleep=15,

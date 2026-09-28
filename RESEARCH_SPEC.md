@@ -1,7 +1,7 @@
 # Research Specification: Batch Audio Extraction & Offline Playlist Automation with yt-dlp & FFmpeg
 
 ## 1. Project Context & Objective
-The user is preparing an offline music library for a road trip in `/home/adarsh/Music/GOA_TRIP_2026`, starting from a curated text file containing 200 track entries at `/tmp/GOA_ROAD_TRIP_200_SONGS.txt`. The host system runs Linux with `/usr/bin/ffmpeg` installed. The goal is to provide a fully automated, production-grade command-line workflow and script using `yt-dlp` and `ffmpeg` that converts plain-text song titles into 320kbps/VBR-0 ID3-tagged `.mp3` files without manual intervention, stream corruption, rate limiting (HTTP 429), or pipeline interruption.
+The user requires an automated audio extraction pipeline in `bulk_songs_downloader`, starting from a curated text file containing track entries (such as `songs.txt`). The host system runs Linux with `/usr/bin/ffmpeg` installed. The goal is to provide a fully automated, production-grade command-line workflow and script using `yt-dlp` and `ffmpeg` that converts plain-text song titles into 320kbps/VBR-0 ID3-tagged `.mp3` files without manual intervention, stream corruption, rate limiting (HTTP 429), or pipeline interruption.
 
 ---
 
@@ -13,7 +13,7 @@ The user is preparing an offline music library for a road trip in `/home/adarsh/
   - **Why It Matters**: Allows direct processing of raw song names and artist strings without pre-scraping URLs.
 - **Claim 1.2**: Appending the keyword `audio` or `official audio` (e.g., `ytsearch1:"Ilahi Arijit Singh audio"`) significantly biases YouTube search ranking toward studio audio releases and lyric tracks rather than vlogs, interviews, or dialogue-heavy music videos.
   - **Source Link**: [yt-dlp Search Prefix Specification](https://github.com/yt-dlp/yt-dlp#search-urls)
-  - **Why It Matters**: Prevents downloading extended video intros or dialogues that ruin a road trip listening experience.
+  - **Why It Matters**: Prevents downloading extended video intros or dialogues that ruin a listening experience.
 - **Claim 1.3**: The flag `--batch-file <FILE>` (or `-a <FILE>`) reads URLs or search queries line by line. If a line is formatted as `ytsearch1:<query>`, `yt-dlp` executes sequential search and download per line.
   - **Source Link**: [yt-dlp General Options](https://github.com/yt-dlp/yt-dlp#general-options)
   - **Why It Matters**: Enables clean separation between playlist preparation/normalization and execution.
@@ -34,12 +34,12 @@ The user is preparing an offline music library for a road trip in `/home/adarsh/
 - **Claim 2.5**: `--embed-thumbnail` downloads the video thumbnail and embeds it as ID3 cover art (`APIC` frame in MP3).
   - **Source Link**: [yt-dlp Thumbnail Options](https://github.com/yt-dlp/yt-dlp#thumbnail-options)
   - **Why It Matters**: Displays album artwork on car screens and music player interfaces.
-- **Claim 2.6**: The output template `-o "%(autonumber)03d - %(title)s.%(ext)s"` or `-o "/home/adarsh/Music/GOA_TRIP_2026/%(title)s.%(ext)s"` formats the local file naming scheme deterministically.
+- **Claim 2.6**: The output template `-o "%(autonumber)03d - %(title)s.%(ext)s"` or `-o "output/%(title)s.%(ext)s"` formats the local file naming scheme deterministically.
   - **Source Link**: [yt-dlp Output Template](https://github.com/yt-dlp/yt-dlp#output-template)
   - **Why It Matters**: Avoids filename collisions and keeps playlist tracks sorted in intended order.
 
 ### Sub-Question 3: Anti-Throttling, Rate Limiting, and Error Recovery
-- **Claim 3.1**: The option `--download-archive /home/adarsh/Music/GOA_TRIP_2026/archive.txt` records every successfully downloaded video ID. If restarted, `yt-dlp` reads the archive and skips already completed tracks immediately without sending download requests.
+- **Claim 3.1**: The option `--download-archive output/archive.txt` records every successfully downloaded video ID. If restarted, `yt-dlp` reads the archive and skips already completed tracks immediately without sending download requests.
   - **Source Link**: [yt-dlp Video Selection Options](https://github.com/yt-dlp/yt-dlp#video-selection-options)
   - **Why It Matters**: Provides atomic idempotency, allowing safe interruption and resumption across a 200-song batch.
 - **Claim 3.2**: Combining `--min-sleep-interval 4` and `--max-sleep-interval 10` introduces randomized sleep jitter between successive downloads.
@@ -70,19 +70,19 @@ The user is preparing an offline music library for a road trip in `/home/adarsh/
 
 ## 3. Production Command-Line Specification
 
-The unified command to process a prepared batch file `/home/adarsh/Music/GOA_TRIP_2026/queries.txt` is:
+The unified command to process a prepared batch file `output/queries.txt` is:
 
 ```bash
 yt-dlp \
-  --batch-file "/home/adarsh/Music/GOA_TRIP_2026/queries.txt" \
+  --batch-file "output/queries.txt" \
   --extract-audio \
   --audio-format mp3 \
   --audio-quality 0 \
   --embed-metadata \
   --embed-thumbnail \
   --ffmpeg-location /usr/bin/ffmpeg \
-  --output "/home/adarsh/Music/GOA_TRIP_2026/output/%(autonumber)03d - %(title)s.%(ext)s" \
-  --download-archive "/home/adarsh/Music/GOA_TRIP_2026/output/archive.txt" \
+  --output "output/%(autonumber)03d - %(title)s.%(ext)s" \
+  --download-archive "output/archive.txt" \
   --ignore-errors \
   --no-playlist \
   --retries 10 \

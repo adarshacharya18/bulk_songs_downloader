@@ -1,14 +1,24 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # download_playlist.sh
-# Production batch audio extraction script for Goa Trip 2026 using yt-dlp & FFmpeg
+# Production batch audio extraction script using yt-dlp & FFmpeg
 # ==============================================================================
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET_DIR="${SCRIPT_DIR}/output"
 mkdir -p "${TARGET_DIR}"
-INPUT_FILE="${1:-/tmp/GOA_ROAD_TRIP_200_SONGS.txt}"
+
+if [[ -n "${1:-}" ]]; then
+    INPUT_FILE="$1"
+elif [[ -f "${SCRIPT_DIR}/songs.txt" ]]; then
+    INPUT_FILE="${SCRIPT_DIR}/songs.txt"
+elif [[ -f "/tmp/GOA_ROAD_TRIP_200_SONGS.txt" ]]; then
+    INPUT_FILE="/tmp/GOA_ROAD_TRIP_200_SONGS.txt"
+else
+    INPUT_FILE="${SCRIPT_DIR}/songs.txt"
+fi
+
 QUERIES_FILE="${TARGET_DIR}/queries.txt"
 ARCHIVE_FILE="${TARGET_DIR}/archive.txt"
 FFMPEG_PATH="/usr/bin/ffmpeg"
@@ -17,7 +27,7 @@ if [[ ! -f "${ARCHIVE_FILE}" && -f "${SCRIPT_DIR}/archive.txt" ]]; then
     cp -p "${SCRIPT_DIR}/archive.txt" "${ARCHIVE_FILE}"
 fi
 
-echo "=== Goa Trip 2026 Playlist Batch Downloader ==="
+echo "=== Bulk Songs Downloader ==="
 echo "Input songlist : ${INPUT_FILE}"
 echo "Target folder  : ${TARGET_DIR}"
 echo "Queries file   : ${QUERIES_FILE}"
@@ -37,6 +47,7 @@ fi
 # 2. Check input file
 if [[ ! -f "${INPUT_FILE}" ]]; then
     echo "Error: Input file '${INPUT_FILE}' does not exist." >&2
+    echo "Please create '${SCRIPT_DIR}/songs.txt' (see 'songs.txt.example') or pass a file: $0 <path>" >&2
     exit 1
 fi
 

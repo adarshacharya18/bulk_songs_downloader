@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-download_playlist.py - Production-grade batch audio extraction for Goa Trip 2026
+download_playlist.py - Production-grade bulk audio downloader using yt-dlp & FFmpeg
 
 Parses plain-text song titles, formats optimized yt-dlp search queries, and invokes
 yt-dlp with FFmpeg transcoding to produce 320k/VBR-0 ID3-tagged MP3 files with cover art,
@@ -16,6 +16,8 @@ import sys
 
 DEFAULT_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_OUTPUT_DIR = os.path.join(DEFAULT_BASE_DIR, "output")
+DEFAULT_SONGS_FILE = os.path.join(DEFAULT_BASE_DIR, "songs.txt")
+FALLBACK_SONGS_FILE = "/tmp/GOA_ROAD_TRIP_200_SONGS.txt"
 
 
 def clean_track_name(raw_name: str) -> str:
@@ -121,14 +123,22 @@ def build_ytdlp_command(
 
 
 def main() -> int:
+    # Determine default input file
+    if os.path.isfile(DEFAULT_SONGS_FILE):
+        default_input = DEFAULT_SONGS_FILE
+    elif os.path.isfile(FALLBACK_SONGS_FILE):
+        default_input = FALLBACK_SONGS_FILE
+    else:
+        default_input = DEFAULT_SONGS_FILE
+
     parser = argparse.ArgumentParser(
         description="Batch download and transcode songs to MP3 using yt-dlp and ffmpeg."
     )
     parser.add_argument(
         "--input-file",
         "-i",
-        default="/tmp/GOA_ROAD_TRIP_200_SONGS.txt",
-        help="Path to the song list text file (default: /tmp/GOA_ROAD_TRIP_200_SONGS.txt)",
+        default=default_input,
+        help=f"Path to the song list text file (default: {default_input})",
     )
     parser.add_argument(
         "--output-dir",
@@ -200,7 +210,12 @@ def main() -> int:
 
     # Validate input file
     if not os.path.isfile(args.input_file):
-        print(f"Error: Input file '{args.input_file}' not found.", file=sys.stderr)
+        print(
+            f"Error: Input file '{args.input_file}' not found.\n"
+            f"Please create a 'songs.txt' file (see 'songs.txt.example' for format) "
+            f"or specify an input file with '--input-file <path>'.",
+            file=sys.stderr,
+        )
         return 1
 
     with open(args.input_file, "r", encoding="utf-8") as f:

@@ -81,8 +81,8 @@ yt-dlp \
   --embed-metadata \
   --embed-thumbnail \
   --ffmpeg-location /usr/bin/ffmpeg \
-  --output "/home/adarsh/Music/GOA_TRIP_2026/%(autonumber)03d - %(title)s.%(ext)s" \
-  --download-archive "/home/adarsh/Music/GOA_TRIP_2026/archive.txt" \
+  --output "/home/adarsh/Music/GOA_TRIP_2026/output/%(autonumber)03d - %(title)s.%(ext)s" \
+  --download-archive "/home/adarsh/Music/GOA_TRIP_2026/output/archive.txt" \
   --ignore-errors \
   --no-playlist \
   --retries 10 \

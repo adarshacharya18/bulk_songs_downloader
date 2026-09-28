@@ -14,6 +14,9 @@ import shutil
 import subprocess
 import sys
 
+DEFAULT_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_OUTPUT_DIR = os.path.join(DEFAULT_BASE_DIR, "output")
+
 
 def clean_track_name(raw_name: str) -> str:
     """
@@ -130,8 +133,8 @@ def main() -> int:
     parser.add_argument(
         "--output-dir",
         "-o",
-        default="/home/adarsh/Music/GOA_TRIP_2026",
-        help="Target directory for downloaded MP3 files",
+        default=DEFAULT_OUTPUT_DIR,
+        help=f"Target directory for downloaded MP3 files (default: {DEFAULT_OUTPUT_DIR})",
     )
     parser.add_argument(
         "--queries-file",
@@ -189,6 +192,11 @@ def main() -> int:
         if args.archive_file
         else os.path.join(output_dir, "archive.txt")
     )
+
+    # If archive does not exist in output_dir, check if a previous root archive exists
+    root_archive = os.path.join(DEFAULT_BASE_DIR, "archive.txt")
+    if not os.path.exists(archive_file) and os.path.exists(root_archive):
+        shutil.copy2(root_archive, archive_file)
 
     # Validate input file
     if not os.path.isfile(args.input_file):

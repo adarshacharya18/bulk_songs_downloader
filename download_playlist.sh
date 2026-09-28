@@ -6,11 +6,16 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TARGET_DIR="${SCRIPT_DIR}"
+TARGET_DIR="${SCRIPT_DIR}/output"
+mkdir -p "${TARGET_DIR}"
 INPUT_FILE="${1:-/tmp/GOA_ROAD_TRIP_200_SONGS.txt}"
 QUERIES_FILE="${TARGET_DIR}/queries.txt"
 ARCHIVE_FILE="${TARGET_DIR}/archive.txt"
 FFMPEG_PATH="/usr/bin/ffmpeg"
+
+if [[ ! -f "${ARCHIVE_FILE}" && -f "${SCRIPT_DIR}/archive.txt" ]]; then
+    cp -p "${SCRIPT_DIR}/archive.txt" "${ARCHIVE_FILE}"
+fi
 
 echo "=== Goa Trip 2026 Playlist Batch Downloader ==="
 echo "Input songlist : ${INPUT_FILE}"
@@ -37,7 +42,7 @@ fi
 
 # 3. Clean track names and generate queries.txt if not already done or if forced
 echo "Preparing search queries from ${INPUT_FILE}..."
-python3 "${SCRIPT_DIR}/download_playlist.py" --input-file "${INPUT_FILE}" --export-only
+python3 "${SCRIPT_DIR}/download_playlist.py" --output-dir "${TARGET_DIR}" --input-file "${INPUT_FILE}" --export-only
 
 # 4. Execute yt-dlp batch download
 echo ""

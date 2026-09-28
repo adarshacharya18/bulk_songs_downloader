@@ -2,6 +2,7 @@ import os
 import unittest
 
 from download_playlist import (
+    DEFAULT_OUTPUT_DIR,
     build_search_query,
     build_ytdlp_command,
     clean_track_name,
@@ -10,6 +11,10 @@ from download_playlist import (
 
 
 class TestDownloadPlaylist(unittest.TestCase):
+    def test_default_output_dir(self):
+        self.assertTrue(DEFAULT_OUTPUT_DIR.endswith("output"))
+        self.assertTrue(os.path.isabs(DEFAULT_OUTPUT_DIR))
+
     def test_clean_track_name_numbered_dot(self):
         self.assertEqual(clean_track_name("1. Ilahi — Arijit Singh"), "Ilahi - Arijit Singh")
         self.assertEqual(clean_track_name("200. Tera Mera Rishta"), "Tera Mera Rishta")

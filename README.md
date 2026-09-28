@@ -25,9 +25,9 @@ Export the batch query file for inspection or separate use:
 ```
 
 ### 3. Run Batch Download
-To start downloading the 200 songs into `/home/adarsh/Music/GOA_TRIP_2026`:
+To start downloading the 200 songs into `/home/adarsh/Music/GOA_TRIP_2026/output`:
 ```bash
-# Using the Python runner:
+# Using the Python runner (downloads directly into ./output/):
 ./download_playlist.py
 
 # Or using the Bash wrapper:
